@@ -40,7 +40,7 @@ $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
 	$(CC) $(CXXFLAGS) $(INCLUDE) -c $< -o $@ -MD $(LDFLAGS)
 
 $(TARGET) : $(OBJECTS)
-	$(CC) $(CXXFLAGS) -pthread $(OBJECTS) -o $(TARGET_DIR)/$(TARGET) $(LDFLAGS)
+	$(CC) $(CXXFLAGS) -pthread $(OBJECTS) -o $(TARGET_DIR)/$(TARGET) -L./library -Wl,-R./library -lmariadbcpp -l:libmariadb.so.3 $(LDFLAGS)
 
 .PHONY: clean all
 clean:
