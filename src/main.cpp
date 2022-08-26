@@ -2,6 +2,33 @@
 #include <iostream>
 #include <conncpp.hpp>
 
+void printContacts(std::shared_ptr<sql::Statement> &stmnt)
+{
+   try {
+      // Execute SELECT Statement
+      std::unique_ptr<sql::ResultSet> res(
+            stmnt->executeQuery("SELECT * FROM test")
+         );
+
+      // Loop over Result-set
+      while (res->next())
+      {
+         // Retrieve Values and Print Contacts
+         std::cout << "- "
+            << res->getString("id")
+            << " "
+            << res->getString("value")
+            << std::endl;
+      }
+   }
+
+   // Catch Exception
+   catch (sql::SQLException& e) {
+      std::cerr << "Error printing contacts: "
+         << e.what() << std::endl;
+   }
+}
+
 int main() {
     std::cout << "Hellos" << std::endl;
     try {
@@ -13,7 +40,7 @@ int main() {
       // ``jdbc:mariadb://host:port/database``.
       //omen-home.iptime.org
       //203.251.63.137
-      sql::SQLString url("tcp://203.251.63.137:8001");
+      sql::SQLString url("tcp://203.251.63.137:5000/test");
 
       // Use a properties map for the user name and password
       sql::Properties properties({
@@ -24,16 +51,11 @@ int main() {
       // Establish Connection
       // Use a smart pointer for extra safety
       std::unique_ptr<sql::Connection> conn(driver->connect(url, properties));
-/*
-      // Created a PreparedStatement
-      // Use a smart pointer for extra safety
-      std::shared_ptr<sql::PreparedStatement> stmnt(
-            conn->prepareStatement(
-               "INSERT INTO test.contacts(first_name, last_name, email) VALUES (?, ?, ?)"
-            )
-         );
-      // Close Connection
-      */
+
+      std::shared_ptr<sql::Statement> stmnt(conn->createStatement());
+
+      printContacts(stmnt);
+      
      
       conn->close();
    }
